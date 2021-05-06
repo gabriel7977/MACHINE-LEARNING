@@ -22,24 +22,17 @@ manner in which the participants of an experiment called
 According to this source the data was collected in the following manner: 
 Six young health participants were asked to perform one set of 10 repetitions of
 the Unilateral Dumbbell Biceps Curl in five different fashions: 
-Class A: according to the specification; 
-Class B:  throwing the elbows to the front;
-Class C: lifting the dumbbell only halfway ;
-Class D: lowering the dumbbell only halfway; and,
-Class E: throwing the hips to the front.
+Class A: according to the specification; Class B:  throwing the elbows to the
+front; Class C: lifting the dumbbell only halfway; Class D: lowering the dumbbell 
+only halfway; and, Class E: throwing the hips to the front.
 Class A corresponds to the specified execution of the exercise, while the other
 4 classes correspond to common mistakes. 
 
-This is the "classe" variable in the training set. You may use any of the other 
-variables to predict with. You should create a report describing how you built 
-your model, how you used cross validation, what you think the expected out of 
-sample error is, and why you made the choices you did. 
-You will also use your prediction model to predict 20 different test cases.
-The data for this project come from this source, whose authors kindly made it 
+(*) The data for this project come from this source, whose authors kindly made it 
 public --"avaliable) for use"-- in the Coursera Machine Learning module: 
 http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har
 
-(*) The details of the experiment, the data frame and the metadata of this 
+The details of the experiment, the data frame and the metadata of this 
 experiment can be consulted in the following paper: 
 Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. 
 Qualitative Activity Recognition of Weight Lifting Exercises.
@@ -121,11 +114,13 @@ sum(complete.cases(pml.testing))
 ```
 ## [1] 0
 ```
+As you may notice, There exists a lot of variables that have missing 
+values. Fortunately this columns seem to be distribution parameters (mean, std,
+Kurtosis; etc).
+
+### Selection of columns to be used
 
 ```r
-#> Cleaning the data sets. There exists a lot of variables that have missing 
-#> values. Fortunately this columns seem to be distribution parameters (mean, std,
-#> Kurtosis; etc).
 col_names_tr<-names(pml.training)[colSums(is.na(pml.training))>0]
 train_clean<-pml.training[,colSums(is.na(pml.training))==0]
 col_names_test<-names(pml.testing)[colSums(is.na(pml.testing))>0]
@@ -168,7 +163,7 @@ sum(complete.cases(test_clean))
 ```r
 rm(pml.testing,pml.training)
 ```
-
+## Model estimation
 
 ```r
 # Model Estimation
@@ -239,10 +234,9 @@ dim(training); dim(testing)
 ```
 ## [1] 5885   53
 ```
+# CART Model (rpart)
 
 ```r
-# CART Model (rpart) 
-library(caret)
 ctrl=trainControl(method="cv") 
 mod_rpart = train(classe~.,training, method="rpart")
 print(mod_rpart)
@@ -310,9 +304,9 @@ pred_rpart <- predict(mod_rpart, testing)
 ## Detection Prevalence   0.2845  0.19354   0.1743   0.1638  0.18386
 ## Balanced Accuracy      0.7175  0.67107   0.6021       NA  0.94233
 ```
+# Random Forest Model
 
 ```r
-# Random Forest Model
 mod_rf = randomForest(classe~.,training)
 print(mod_rf)
 ```

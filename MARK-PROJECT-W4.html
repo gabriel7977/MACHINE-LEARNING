@@ -176,9 +176,9 @@ pre code {
 <div id="executive-summary" class="section level3">
 <h3>Executive summary</h3>
 <p>In this document I present the results of the week 4 project assignment. The goal of the project is to estimate a model that can be used to predict the manner in which the participants of an experiment called “Human Activity Recognition” (HAR) have performed the exercise. (“The classe column” in the Data frame).(*)</p>
-<p>According to this source the data was collected in the following manner: Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: Class A: according to the specification; Class B: throwing the elbows to the front; Class C: lifting the dumbbell only halfway ; Class D: lowering the dumbbell only halfway; and, Class E: throwing the hips to the front. Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes.</p>
-<p>This is the “classe” variable in the training set. You may use any of the other variables to predict with. You should create a report describing how you built your model, how you used cross validation, what you think the expected out of sample error is, and why you made the choices you did. You will also use your prediction model to predict 20 different test cases. The data for this project come from this source, whose authors kindly made it public –“avaliable) for use”– in the Coursera Machine Learning module: <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har" class="uri">http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har</a></p>
-<p>(*) The details of the experiment, the data frame and the metadata of this experiment can be consulted in the following paper: Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013.</p>
+<p>According to this source the data was collected in the following manner: Six young health participants were asked to perform one set of 10 repetitions of the Unilateral Dumbbell Biceps Curl in five different fashions: Class A: according to the specification; Class B: throwing the elbows to the front; Class C: lifting the dumbbell only halfway; Class D: lowering the dumbbell only halfway; and, Class E: throwing the hips to the front. Class A corresponds to the specified execution of the exercise, while the other 4 classes correspond to common mistakes.</p>
+<p>(*) The data for this project come from this source, whose authors kindly made it public –“avaliable) for use”– in the Coursera Machine Learning module: <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har" class="uri">http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har</a></p>
+<p>The details of the experiment, the data frame and the metadata of this experiment can be consulted in the following paper: Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013.</p>
 </div>
 </div>
 <div id="downloading-data" class="section level2">
@@ -212,10 +212,10 @@ sum(complete.cases(pml.training))</code></pre>
 <pre><code>## [1] 406</code></pre>
 <pre class="r"><code>sum(complete.cases(pml.testing))</code></pre>
 <pre><code>## [1] 0</code></pre>
-<pre class="r"><code>#&gt; Cleaning the data sets. There exists a lot of variables that have missing 
-#&gt; values. Fortunately this columns seem to be distribution parameters (mean, std,
-#&gt; Kurtosis; etc).
-col_names_tr&lt;-names(pml.training)[colSums(is.na(pml.training))&gt;0]
+<p>As you may notice, There exists a lot of variables that have missing values. Fortunately this columns seem to be distribution parameters (mean, std, Kurtosis; etc).</p>
+<div id="selection-of-columns-to-be-used" class="section level3">
+<h3>Selection of columns to be used</h3>
+<pre class="r"><code>col_names_tr&lt;-names(pml.training)[colSums(is.na(pml.training))&gt;0]
 train_clean&lt;-pml.training[,colSums(is.na(pml.training))==0]
 col_names_test&lt;-names(pml.testing)[colSums(is.na(pml.testing))&gt;0]
 test_clean&lt;-pml.testing[,colSums(is.na(pml.testing))==0]
@@ -238,6 +238,10 @@ sum(complete.cases(train_clean))</code></pre>
 <pre class="r"><code>sum(complete.cases(test_clean))</code></pre>
 <pre><code>## [1] 20</code></pre>
 <pre class="r"><code>rm(pml.testing,pml.training)</code></pre>
+</div>
+</div>
+<div id="model-estimation" class="section level2">
+<h2>Model estimation</h2>
 <pre class="r"><code># Model Estimation
 library(caret); library(randomForest)</code></pre>
 <pre><code>## Warning: package &#39;caret&#39; was built under R version 4.0.5</code></pre>
@@ -266,9 +270,10 @@ testing=train_clean[-inTrain,] [8:60]
 dim(training); dim(testing)</code></pre>
 <pre><code>## [1] 13737    53</code></pre>
 <pre><code>## [1] 5885   53</code></pre>
-<pre class="r"><code># CART Model (rpart) 
-library(caret)
-ctrl=trainControl(method=&quot;cv&quot;) 
+</div>
+<div id="cart-model-rpart" class="section level1">
+<h1>CART Model (rpart)</h1>
+<pre class="r"><code>ctrl=trainControl(method=&quot;cv&quot;) 
 mod_rpart = train(classe~.,training, method=&quot;rpart&quot;)
 print(mod_rpart)</code></pre>
 <pre><code>## CART 
@@ -325,8 +330,10 @@ pred_rpart &lt;- predict(mod_rpart, testing)
 ## Detection Rate         0.2571  0.06423   0.0853   0.0000  0.08377
 ## Detection Prevalence   0.2845  0.19354   0.1743   0.1638  0.18386
 ## Balanced Accuracy      0.7175  0.67107   0.6021       NA  0.94233</code></pre>
-<pre class="r"><code># Random Forest Model
-mod_rf = randomForest(classe~.,training)
+</div>
+<div id="random-forest-model" class="section level1">
+<h1>Random Forest Model</h1>
+<pre class="r"><code>mod_rf = randomForest(classe~.,training)
 print(mod_rf)</code></pre>
 <pre><code>## 
 ## Call:
@@ -379,7 +386,6 @@ pred_rf &lt;- predict(mod_rf, testing)
 ## Detection Rate         0.2845   0.1925   0.1732   0.1619   0.1839
 ## Detection Prevalence   0.2845   0.1935   0.1743   0.1638   0.1839
 ## Balanced Accuracy      0.9991   0.9972   0.9930   0.9978   0.9995</code></pre>
-</div>
 <div id="prediction" class="section level2">
 <h2>Prediction</h2>
 <p>According to the accuracy results the “best” model among the two that were estimated is the Random Forest. The accuracy is 99.5% vs. 51% in the CART model The final prediction on the test data frame (validation set?) is the following:</p>
@@ -387,6 +393,7 @@ pred_rf &lt;- predict(mod_rf, testing)
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
 ##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
 ## Levels: A B C D E</code></pre>
+</div>
 </div>
 
 
